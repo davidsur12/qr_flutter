@@ -1,5 +1,8 @@
 {
   "app_name": "Mi Aplicación",
   "welcome_message": "¡Bienvenido a la aplicación!",
-  "login_button": "Iniciar sesión"
+  "login_button": "Iniciar sesión",
+  "luz": "Luz",
+  "scanear_imagen": "Scanear Imagen"
+
 }

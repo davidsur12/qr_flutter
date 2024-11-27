@@ -42,6 +42,12 @@ dependencies:
   qr_mobile_vision: ^5.0.2
   persistent_bottom_nav_bar: ^6.2.1
   get: ^4.6.6
+  fluttertoast: ^8.2.8
+  intl_utils: ^2.8.7
+  pretty_qr_code: ^3.3.0
+  image_picker: ^1.1.2
+  simple_image_cropper: ^1.0.0
+  image_cropper: ^8.0.2
 
 dev_dependencies:
   flutter_test:
