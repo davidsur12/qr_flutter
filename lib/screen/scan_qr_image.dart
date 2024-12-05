@@ -1,7 +1,18 @@
 
+
+
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:qr3/utils/datos.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ScanQrImage extends StatefulWidget {
   final File image;
@@ -14,11 +25,14 @@ class ScanQrImage extends StatefulWidget {
 
 class _ScanQrImageState extends State<ScanQrImage> {
   File? _croppedImage;
+  String? _qrCode;
+  String tituloAppbar = "Scaner QR";
+  GlobalKey _qrKey = GlobalKey(); // Clave global para el RepaintBoundary
+  TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Llamar al recorte automáticamente al iniciar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _cropImage();
     });
@@ -28,15 +42,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
     try {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: widget.image.path,
-
         aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-     /*   aspectRatioPresets: [
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9,
-        ],*/
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Recortar Imagen',
@@ -53,10 +59,11 @@ class _ScanQrImageState extends State<ScanQrImage> {
 
       if (croppedFile != null) {
         setState(() {
-          _croppedImage = File(croppedFile.path); // Guarda la imagen recortada
+          _croppedImage = File(croppedFile.path);
         });
+        // Escanear el QR una vez recortada la imagen
+        _scanQrCode(File(croppedFile.path));
       } else {
-        // Si el usuario cancela, vuelve a la pantalla anterior
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -64,93 +71,174 @@ class _ScanQrImageState extends State<ScanQrImage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recortar Imagen'),
-      ),
-      body: Center(
-        child: _croppedImage == null
-            ? const CircularProgressIndicator() // Muestra un indicador mientras se recorta
-            : Image.file(_croppedImage!, fit: BoxFit.contain),
-      ),
-    );
-  }
-}
+  Future<void> _scanQrCode(File imageFile) async {
+    try {
+      final result = await MobileScannerController()
+          .analyzeImage(imageFile.path); // Analizar la imagen
 
-
-/*
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
-
-class ScanQrImage extends StatefulWidget {
-  final File image;
-
-  const ScanQrImage({super.key, required this.image});
-
-  @override
-  State<ScanQrImage> createState() => _ScanQrImageState();
-}
-
-class _ScanQrImageState extends State<ScanQrImage> {
-  File? _croppedImage;
-
-  Future<void> _cropImage() async {
-    // Llama a ImageCropper para recortar la imagen
-    final croppedFile = await ImageCropper().cropImage(
-      sourcePath: widget.image.path,
-      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1), // Relación de aspecto fija
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Recortar Imagen',
-          toolbarColor: Colors.blue,
-          toolbarWidgetColor: Colors.white,
-          lockAspectRatio: false, // Permite cambiar libremente la relación de aspecto
-          backgroundColor: Colors.black,
-        ),
-        IOSUiSettings(
-          title: 'Recortar Imagen',
-          aspectRatioLockEnabled: false, // Permite cambiar libremente la relación de aspecto
-        ),
-      ],
-    );
-
-    if (croppedFile != null) {
+      if (result != null && result.barcodes.isNotEmpty) {
+        setState(() {
+          _qrCode = result.barcodes.first.rawValue ?? "QR no válido";
+        });
+      } else {
+        setState(() {
+          _qrCode = "No se detectó un QR.";
+        });
+      }
+    } catch (e) {
+      debugPrint("Error al leer el QR: $e");
       setState(() {
-        _croppedImage = File(croppedFile.path); // Actualiza la imagen recortada
+        _qrCode = "Error al leer el QR.";
       });
     }
   }
 
+  // Función para capturar el QR como imagen y guardarlo en el almacenamiento local
+  Future<void> _saveQrToFile(String qrData, String name) async {
+    try {
+      // Renderizar el QrImageView en un RepaintBoundary
+      RenderRepaintBoundary boundary = _qrKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
+      if (boundary != null) {
+        ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+        ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+        if (byteData != null) {
+          Uint8List pngBytes = byteData.buffer.asUint8List();
+          await Datos().saveImageToLocal2(pngBytes, name);
+        }
+      }
+    } catch (e) {
+      print('Error al guardar el QR: $e');
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recortar Imagen'),
+        title: Text(tituloAppbar),
       ),
-      body: Column(
+      body: _croppedImage == null
+          ? const Center(
+        child: CircularProgressIndicator(),
+      ) // Mientras carga muestra un loader
+          : Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: _croppedImage == null
-                ? Image.file(widget.image, fit: BoxFit.contain)
-                : Image.file(_croppedImage!, fit: BoxFit.contain),
-          ),
-          if (_croppedImage == null)
+          if (_qrCode != null)
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton.icon(
-                onPressed: _cropImage,
-                icon: const Icon(Icons.crop),
-                label: const Text('Recortar Imagen'),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: resultado(
+                  Datos().interpretQRCode(_qrCode ?? "0"), _qrCode ?? "0"),
+            ),
+          const Spacer(), // Empuja los elementos anteriores hacia arriba
+          Center(
+            child: RepaintBoundary(
+              key: _qrKey,
+              child: QrImageView(
+                data: _qrCode ?? "0", // Usamos el código QR escaneado
+                version: QrVersions.auto,
+                size: 200.0,
+                backgroundColor: Colors.white, // Fondo blanco para el QR
               ),
             ),
+          ),
+          const SizedBox(height: 20), // Espaciado entre la imagen y el botón
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                _showAlertDialog(context);
+                //  _saveQrToFile(_qrCode ?? "0");
+              },
+              child: Text("Guardar QR como Imagen"),
+            ),
+          ),
+          const Spacer(), // Empuja los elementos hacia abajo si es necesario
         ],
       ),
     );
   }
+
+  Widget resultado(int typo, String resultt) {
+    Widget result = Text("data");
+    switch (typo) {
+      case 2:
+        result = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () => _launchUrl(resultt),
+              style: TextButton.styleFrom(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.zero,
+                minimumSize: Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                resultt,
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            const Text("QR Code"),
+            const SizedBox(height: 8),
+            Text(Datos().getFecha()),
+            const SizedBox(height: 18),
+          ],
+        );
+        break;
+    }
+    return result;
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri _url = Uri.parse(url);
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
+
+  void _showAlertDialog(BuildContext context) {
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ingrese un texto'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'Escribe algo'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+
+                // Acción cuando se presiona el botón OK
+                String inputText = controller.text;
+                print('Texto ingresado: $inputText');
+                Navigator.of(context).pop(); // Cierra el diálogo
+                _saveQrToFile(_qrCode ?? "0", controller.text ?? "qr");
+                showtoast(controller.text);
+
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showtoast(String msg){
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT, // Duración: SHORT o LONG
+      gravity: ToastGravity.BOTTOM, // Posición: TOP, CENTER, BOTTOM
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
 }
 
-
-*/

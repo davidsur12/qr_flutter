@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qr3/screen/qr_save.dart';
 import 'package:qr3/screen/qr_scaneado.dart';
 import 'package:qr3/screen/scan_qr_image.dart';
 import 'package:qr3/utils/cadenas.dart';
@@ -67,7 +68,12 @@ class MyAppState extends State<ScannerQr> {
       appBar: AppBar(
         title:Text(Cadenas.get("app_name")),
         actions: <Widget>[
-          IconButton(icon: const Icon(Icons.light), onPressed: _swapBackLightState),
+          IconButton(icon: const Icon(Icons.light), onPressed:(){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => QrSave()),
+            );
+          }),
         ],
       ),
       body: Center(
@@ -123,13 +129,16 @@ Widget _opcionesScanerQr(){
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Column(children: [IconButton(onPressed: (){}, icon: Icon(Icons.lightbulb), color: Colors.white, ),Text(Cadenas.get("luz",),style:TextStyle(color: Colors.white,))],),
+        Column(children: [IconButton(onPressed: (){
+          _swapBackLightState();
+        }, icon: Icon(Icons.lightbulb), color: Colors.white, ),Text(Cadenas.get("luz",),style:TextStyle(color: Colors.white,))],),
         SizedBox(width: 20,),
         Column(children: [ IconButton(onPressed: (){ _pickImage(ImageSource.gallery);}, icon: Icon(Icons.qr_code), color: Colors.white), Text(Cadenas.get("scanear_imagen",),style:TextStyle(color: Colors.white,))],)
    ],);
 
 }
   _swapBackLightState() async {
+    //prende el flash
     QrCamera.toggleFlash();
   }
 

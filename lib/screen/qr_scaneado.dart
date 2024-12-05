@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:qr3/screen/qr.dart';
 import 'package:qr3/utils/datos.dart';
-import 'package:intl_utils/intl_utils.dart';
 import 'package:intl/intl.dart';
 
 class QrScaneado extends StatefulWidget {
