@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Datos {
   static final Datos _instancia = Datos._internal();
@@ -362,9 +363,26 @@ class Datos {
     return event.trim();
   }
 
-
+  Future<void> launchUrll(String url) async {
+    final Uri _url = Uri.parse(url);
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
   // Función para agregar el evento al calendario
   // Cargar los calendarios disponibles en el dispositivo
+
+  Future<void> openLocationInMaps(String latitude, String longitude, BuildContext context) async {
+    final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      print("Mapa abierto exitosamente");
+    } else {
+      print("No se pudo abrir el mapa");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo abrir el mapa. Por favor verifica las coordenadas.')),
+      );
+    }
+  }
 
 
 }

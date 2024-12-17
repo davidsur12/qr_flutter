@@ -1,21 +1,17 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:qr3/utils/datos.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart' as add2cal;
-import 'package:device_calendar/device_calendar.dart' as devicecal;
 
 
 class ScanQrImage extends StatefulWidget {
@@ -33,8 +29,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
   String tituloAppbar = "Scaner QR";
   GlobalKey _qrKey = GlobalKey(); // Clave global para el RepaintBoundary
   TextEditingController controller = TextEditingController();
-  final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
-  Calendar? _selectedCalendar;
+
 
   @override
   void initState() {
@@ -185,7 +180,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
                                 final xFile = XFile(filePath);
                                 await Share.shareXFiles(
                                   [xFile],
-                                  text: '¡Mira esta imagen que compartí desde mi app!',
+                                  text: 'Compartiendo',
                                 );
 
                                 print('Imagen compartida exitosamente.');

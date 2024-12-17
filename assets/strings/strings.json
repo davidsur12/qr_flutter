@@ -3,6 +3,12 @@
   "welcome_message": "¡Bienvenido a la aplicación!",
   "login_button": "Iniciar sesión",
   "luz": "Luz",
-  "scanear_imagen": "Scanear Imagen"
+  "scanear_imagen": "Scanear Imagen",
+  "sitio_web": "Sitio web",
+  "contacto": "Contacto",
+  "red_wifi": "Wifi",
+  "Ubicacion": "Ubicacion",
+  "evento": "Evento"
+
 
 }
