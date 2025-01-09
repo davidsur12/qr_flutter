@@ -29,7 +29,7 @@ class MyAppState extends State<ScannerQr> {
   initState() {
     super.initState();
     camState = true;
-    showtoast("inistate");
+
 
   }
 
@@ -68,7 +68,7 @@ class MyAppState extends State<ScannerQr> {
       appBar: AppBar(
         title:Text(Cadenas.get("app_name")),
         actions: <Widget>[
-          IconButton(icon: const Icon(Icons.light), onPressed:(){
+          IconButton(icon: const Icon(Icons.save), onPressed:(){
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => QrSave()),
@@ -112,7 +112,7 @@ class MyAppState extends State<ScannerQr> {
                   ),
                 )
                     : const Center(child: Text("Camera inactive"))),
-            Text("QRCODE: $qr"),
+
           ],
         ),
       ),
@@ -129,9 +129,13 @@ Widget _opcionesScanerQr(){
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Column(children: [IconButton(onPressed: (){
+        /*
+        Column(children: [
+          IconButton(onPressed: (){
           _swapBackLightState();
         }, icon: Icon(Icons.lightbulb), color: Colors.white, ),Text(Cadenas.get("luz",),style:TextStyle(color: Colors.white,))],),
+
+        */
         SizedBox(width: 20,),
         Column(children: [ IconButton(onPressed: (){ _pickImage(ImageSource.gallery);}, icon: Icon(Icons.qr_code), color: Colors.white), Text(Cadenas.get("scanear_imagen",),style:TextStyle(color: Colors.white,))],)
    ],);
@@ -142,53 +146,7 @@ Widget _opcionesScanerQr(){
     QrCamera.toggleFlash();
   }
 
-  @override
-  void OnPause(){
 
-    showtoast("On pause");
-
-  }
-
-
-  @override
-  void OnRestar(){
-    showtoast("On restar");
-
-  }
-
-
-  @override
-  void OnDestroy(){
-
-    showtoast("On destroy");
-
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    showtoast(" didChangeDependencies");
-  }
-
-  @override
-  void deactivate() {
-    // TODO: implement deactivate
-    showtoast("deactivate");
-    camState = true;
-    super.deactivate();
-
-
-  }
-
-
-  @override void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    camState = true;
-    showtoast("dispose");
-
-  }
 
 
 

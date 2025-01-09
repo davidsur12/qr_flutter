@@ -1,5 +1,6 @@
 {
-  "app_name": "Mi Aplicación",
+  "app_name": "Lector QR",
+  "save": "QR Guardados",
   "welcome_message": "¡Bienvenido a la aplicación!",
   "login_button": "Iniciar sesión",
   "luz": "Luz",
@@ -8,7 +9,10 @@
   "contacto": "Contacto",
   "red_wifi": "Wifi",
   "Ubicacion": "Ubicacion",
-  "evento": "Evento"
+  "evento": "Evento",
+  "ubicacion": "Ubicacion",
+  "texto": "Texto",
+  "configuraciones": "configuraciónes"
 
 
 }

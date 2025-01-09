@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr3/screen/qr_view_recuperado.dart';
+import 'package:qr3/utils/cadenas.dart';
 import 'package:qr3/utils/datos.dart';
 
 
@@ -16,7 +17,7 @@ class _QrSaveState extends State<QrSave> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tituloAppbar),
+        title: Text(Cadenas.get("save")),
       ),
       body:FutureBuilder(future: Datos().getSavedImages(), builder: (context, snapshot) {
 

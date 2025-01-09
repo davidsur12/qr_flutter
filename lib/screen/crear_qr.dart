@@ -1,6 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr3/screen/formularios/screeen_texto.dart';
+import 'package:qr3/screen/formularios/screen_contacto.dart';
+import 'package:qr3/screen/formularios/screen_evento.dart';
+import 'package:qr3/screen/formularios/screen_ubicacion.dart';
+import 'package:qr3/screen/formularios/screen_web.dart';
+import 'package:qr3/screen/formularios/screen_wifi.dart';
 import 'package:qr3/utils/cadenas.dart';
 
 class CrearQr extends StatefulWidget {
@@ -15,30 +20,71 @@ class _CrearQrState extends State<CrearQr> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lector QR', style: TextStyle(color: Colors.white),),
-        actions: [IconButton(onPressed: (){
-          Get.changeTheme(Get.isDarkMode?ThemeData.light(): ThemeData.dark());//cambio de thema
+        title: Text(
+    Cadenas.get("app_name"),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
+        actions: [
 
-        }, icon: Icon(Icons.abc))],
+        ],
       ),
-      body: Column(
+      body:
+      Expanded(child: SingleChildScrollView(child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+Image.asset("assets/images/qr.png",width: 150,),
+          SizedBox(height: 20,),
+          Center(
+            child: SizedBox(
+                width: 400,
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.web),
+                  onPressed: () {
+                    navigatorFormulario(ScreenWeb());
+                  },
+
+                  label: Text(Cadenas.get("sitio_web"), style: TextStyle(color: Theme.of(context).colorScheme.surface),), // Texto
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary, // Fondo del botón
+                  ),
+                )),
+          ),
+          btn("contacto", ScreeenContacto()),
+          btn("red_wifi", ScreenWifi()),
+          btn("texto", ScreenTexto()),
+          btn("evento", ScreenEvento()),
+          btn("ubicacion", ScreenUbicacion()),
 
 
-       Center(child: SizedBox(
-           width: 200,
-           child: ElevatedButton(onPressed: (){}, child: Text(Cadenas.get("sitio_web")))),),
-        ElevatedButton(onPressed: (){}, child: Text(Cadenas.get("contacto"))),
-        ElevatedButton(onPressed: (){}, child: Text(Cadenas.get("red_wifi"))),
-        ElevatedButton(onPressed: (){}, child: Text(Cadenas.get("ubicacion"))),
-        ElevatedButton(onPressed: (){}, child: Text(Cadenas.get("evento"))),
+        ],
+      ))),
+    );
+  }
 
+  void navigatorFormulario(Widget pantalla) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => pantalla),
+    );
+  }
 
-      ],),
+  Widget btn(String nombre, Widget pantalla ){
+
+    return   Center(
+      child: SizedBox(
+          width: 400,
+          child: ElevatedButton.icon(
+            icon: Icon(Icons.web),
+            onPressed: () {
+              navigatorFormulario(pantalla);
+            },
+
+            label: Text(Cadenas.get(nombre), style: TextStyle(color: Theme.of(context).colorScheme.surface),), // Texto
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary, // Fondo del botón
+            ),
+          )),
     );
   }
 }
-
-

@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr3/utils/cadenas.dart';
 import 'package:qr3/utils/datos.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -119,7 +120,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(tituloAppbar),
+          title: Text(Cadenas.get("app_name")),
         ),
         body: _croppedImage == null
             ? const Center(
@@ -141,6 +142,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
                           _qrCode ?? "0",
                         ),
                       ),
+                    const SizedBox(height: 20),
                     Center(
                       child: RepaintBoundary(
                         key: _qrKey,
@@ -163,7 +165,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
                             onPressed: () {
                               _showAlertDialog(context);
                             },
-                            icon: Icon(Icons.save),
+                            icon: Icon(Icons.save, color: Theme.of(context).colorScheme.primary,),
                           ),
                           IconButton(
                             onPressed: () async {
@@ -189,7 +191,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
                                     'Error al intentar compartir la imagen: $e');
                               }
                             },
-                            icon: Icon(Icons.share),
+                            icon: Icon(Icons.share,  color: Theme.of(context).colorScheme.primary),
                           ),
                         ],
                       ),
@@ -201,61 +203,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
           ],
         )
 
-/*
-    Column(children:[Expanded(child:  SingleChildScrollView(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_qrCode != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: resultado(
-                  Datos().interpretQRCode(_qrCode ?? "0"), _qrCode ?? "0"),
-            ),
-          const Spacer(), // Empuja los elementos anteriores hacia arriba
-          Center(
-            child: RepaintBoundary(
-              key: _qrKey,
-              child: QrImageView(
-                data: _qrCode ?? "0", // Usamos el código QR escaneado
-                version: QrVersions.auto,
-                size: 200.0,
-                backgroundColor: Colors.white, // Fondo blanco para el QR
-              ),
-            ),
-          ),
-          const SizedBox(height: 20), // Espaciado entre la imagen y el botón
-          Center(child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [IconButton(onPressed: (){  _showAlertDialog(context);}, icon: Icon(Icons.save)),
-          IconButton(  onPressed: () async {
-            try {
-              // Verificar que el archivo existe antes de compartir
-              final filePath = widget.image.path;
-              if (filePath == null || filePath.isEmpty) {
-                print('Error: No se proporcionó una ruta válida para el archivo.');
-                return;
-              }
 
-              // Crear el objeto XFile y compartirlo
-              final xFile = XFile(filePath);
-              await Share.shareXFiles(
-                  [xFile],
-                  text: '¡Mira esta imagen que compartí desde mi app!'
-              );
-
-              print('Imagen compartida exitosamente.');
-            } catch (e) {
-              print('Error al intentar compartir la imagen: $e');
-            }
-          }, icon: Icon(Icons.share))],),),
-
-
-
-          const Spacer(), // Empuja los elementos hacia abajo si es necesario
-        ],
-      )))]),
-
-      */
     );
   }
 
@@ -324,7 +272,7 @@ class _ScanQrImageState extends State<ScanQrImage> {
     launchUrl(Uri.parse('mailto:$email'));
 
     },child:Text('Enviar correo')),
-    SizedBox(height: 20,),
+    SizedBox(height: 40,),
 
 
     if (vcardData['URL'] != null && vcardData['URL']!.isNotEmpty)
@@ -476,16 +424,27 @@ print("resultado $resultt");
         final event = parseEvent(resultt);
 
         result= Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //Text(Datos().processEvent(resultt)),
             Text('Evento: ${event.title}\nDescripción: ${event.description}\nInicio: ${event.startDate}\nFin: ${event.endDate}'),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                add2cal.Add2Calendar.addEvent2Cal(event);
-              },
-              child: Text('Agregar al Calendario'),
-            ),
+           Row(
+             mainAxisAlignment: MainAxisAlignment.center,
+             crossAxisAlignment: CrossAxisAlignment.center,
+             children: [SizedBox(
+               width: 250,
+               child: ElevatedButton(
+                 style: ElevatedButton.styleFrom(
+                   backgroundColor: Theme.of(context).colorScheme.primary, // Fondo del botón
+                 ),
+                 onPressed: () {
+                   add2cal.Add2Calendar.addEvent2Cal(event);
+                 },
+                 child: Text('Agregar al Calendario', style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+               ))],)
+           ,
           ],
         );
 
